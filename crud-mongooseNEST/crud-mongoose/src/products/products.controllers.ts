@@ -12,6 +12,9 @@ import {
   Put,
 } from '@nestjs/common';
 
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+
 import { Response } from 'express';
 // import service
 
@@ -29,17 +32,13 @@ export class ProductController {
   }
 
   @Post('insertProduct')
-  async addNewProduct(@Body() body: any) {
+  async addNewProduct(@Body() createProductDto: CreateProductDto) {
     console.log(`controller called`);
 
-    console.log(`Body:`, body);
+    console.log(`Body:`, createProductDto);
 
-    const { title, description, price } = body;
-    const newProduct = await this.productService.insertProduct({
-      price,
-      title,
-      description,
-    });
+    const newProduct =
+      await this.productService.insertProduct(createProductDto);
     return {
       status: 'success',
       message: 'Product Created Successfully',
@@ -61,35 +60,36 @@ export class ProductController {
   }
 
   @Get('getProductById')
-  getProductById(@Query('id') id: string): { status: number; data: Product } {
+  async getProductById(@Query('id') id: string): Promise<Product> {
     console.log(id);
 
-    const product = this.productService.getProductById(id);
-    return {
-      status: 200,
-      data: product,
-    };
+    const product = await this.productService.getProductById(id);
+    return product;
   }
 
   @Patch('updateProduct')
-  updateProduct(
+  async updateProduct(
     @Query('id') id: string,
     @Body('title') title: string,
     @Body('description') description: string,
     @Body('price') price: number,
-  ): { status: string; data: Product } {
-    console.log(`updateProduct called`);
+  ): Promise<Product> {
+    try {
+      console.log(`updateProduct called`);
 
-    console.log(title);
-    console.log(price);
-    console.log(description);
+      console.log(title);
+      console.log(price);
+      console.log(description);
 
-    const product = this.productService.updateProduct(id, {
-      title: title,
-      price: price,
-      description: description,
-    });
-    return { status: 'success', data: product };
+      const product = await this.productService.updateProduct(id, {
+        title: title,
+        price: price,
+        description: description,
+      });
+      return product;
+    } catch (error) {
+      throw new NotFoundException('Product Not Found');
+    }
   }
 
   @Delete('deleteProduct')
