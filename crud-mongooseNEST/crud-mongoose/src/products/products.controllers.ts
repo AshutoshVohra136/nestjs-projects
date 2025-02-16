@@ -29,20 +29,14 @@ export class ProductController {
   }
 
   @Post('insertProduct')
-  addNewProduct(
-    @Body('title') prodTitle: string,
-    @Body('description') prodDes: string,
-    @Body('price') prodPrice: number,
-  ) {
+  addNewProduct(@Body() body: any) {
     console.log(`controller called`);
-    console.log(prodTitle, prodDes, prodPrice);
 
-    return this.productService.insertProduct(
-      prodTitle,
+    console.log(`Body:`, body);
 
-      prodPrice,
-      prodDes,
-    );
+    const { title, description, price } = body;
+
+    return this.productService.insertProduct(title, description, price);
   }
   @Get('getAllProducts')
   getAllProducts(): Product[] {
