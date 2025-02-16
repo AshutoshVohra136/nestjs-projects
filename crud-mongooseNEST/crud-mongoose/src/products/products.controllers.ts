@@ -29,17 +29,25 @@ export class ProductController {
   }
 
   @Post('insertProduct')
-  addNewProduct(@Body() body: any) {
+  async addNewProduct(@Body() body: any) {
     console.log(`controller called`);
 
     console.log(`Body:`, body);
 
     const { title, description, price } = body;
-
-    return this.productService.insertProduct(title, description, price);
+    const newProduct = await this.productService.insertProduct({
+      price,
+      title,
+      description,
+    });
+    return {
+      status: 'success',
+      message: 'Product Created Successfully',
+      data: newProduct,
+    };
   }
   @Get('getAllProducts')
-  getAllProducts(): Product[] {
+  getAllProducts() {
     return this.productService.gt();
   }
 
